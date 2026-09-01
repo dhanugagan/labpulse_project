@@ -1,0 +1,105 @@
+================================================================
+GITHUB PAGES DEPLOYMENT — GET A LIVE URL IN UNDER 2 MINUTES
+================================================================
+
+IMPORTANT REALITY CHECK FIRST
+----------------------------------------------------------------
+GitHub Pages only serves static files (HTML/CSS/JS). It cannot
+run the Node.js/Express backend in backend/. So:
+
+- index.html at the project root IS the thing that goes live.
+  It is a fully self-contained, backend-free rebuild of LabPulse
+  — RBAC, CRUD, phantom booking detection, root cause analysis,
+  health scores, and the Genie chat all run entirely in the
+  browser using localStorage as the "database."
+- backend/ and frontend/ remain in the repo as the real,
+  production-shaped source code (for judges who want to see the
+  actual architecture, or for deploying separately to a Node host
+  like Render/Railway later). They just won't be "live" on the
+  GitHub Pages URL itself.
+
+This is the correct way to get a working, clickable demo link for
+judges without needing a paid server.
+
+----------------------------------------------------------------
+STEP-BY-STEP
+----------------------------------------------------------------
+
+1. Create a new GitHub repository (via github.com > New repository).
+   Name it something like: labpulse
+
+2. From inside the unzipped labpulse_project folder, run:
+
+   git init
+   git add .
+   git commit -m "LabPulse — full stack project + static GitHub Pages demo"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/labpulse.git
+   git push -u origin main
+
+   Replace YOUR_USERNAME and the repo name with your own.
+
+3. On GitHub, go to your repo -> Settings -> Pages.
+
+4. Under "Build and deployment":
+   - Source: Deploy from a branch
+   - Branch: main
+   - Folder: / (root)
+   Click Save.
+
+5. Wait about 30-60 seconds. GitHub will show you the live URL at
+   the top of that same Pages settings screen. It will follow this
+   exact pattern:
+
+   https://YOUR_USERNAME.github.io/labpulse/
+
+   Because index.html sits at the repository root, GitHub Pages
+   finds it automatically — no extra configuration needed.
+
+6. Open that URL. You'll land on the LabPulse login screen. Use
+   any of the demo accounts listed on the login page itself
+   (also documented in README.md) to explore each role's dashboard.
+
+----------------------------------------------------------------
+IF YOU ALREADY HAVE A REPO / WANT A DIFFERENT NAME
+----------------------------------------------------------------
+The URL always follows this pattern:
+
+   https://<your-github-username>.github.io/<repository-name>/
+
+If your repository is named exactly YOUR_USERNAME.github.io (a
+special "user site" repo), the URL is simply:
+
+   https://YOUR_USERNAME.github.io/
+
+with no repo-name path segment.
+
+----------------------------------------------------------------
+UPDATING THE LIVE DEMO LATER
+----------------------------------------------------------------
+Any time you edit index.html and push to the same branch GitHub
+Pages is watching (main, root folder), the live URL updates
+automatically within about a minute — no redeploy step needed.
+
+----------------------------------------------------------------
+WHAT'S DIFFERENT ABOUT THE STATIC DEMO VS THE FULL BACKEND
+----------------------------------------------------------------
+- Data lives in the browser's localStorage instead of a real
+  database, so it's local to each visitor's browser and resets if
+  they clear site data (there's a "Reset demo data" link/button
+  built in for exactly this).
+- There's no real Databricks Genie connection — the same
+  rule-based logic from backend/services/genieService.js and
+  analyticsService.js was ported directly into client-side
+  JavaScript, so the answers Genie gives (utilisation %, phantom
+  booking detection, root cause analysis) are computed the same
+  way, just without a network call.
+- Every other feature — RBAC per role, booking CRUD, maintenance
+  ticket workflow, health scores, demand intelligence, the
+  executive insight — works exactly as it does in the full app,
+  because the underlying logic is identical, just relocated to
+  run in the browser instead of on a server.
+
+This means your live GitHub Pages link is a fully working,
+clickable demo of the actual product logic — not a mockup.
+================================================================

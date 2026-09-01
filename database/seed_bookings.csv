@@ -1,0 +1,17 @@
+booking_id,facility_id,requested_by,approved_by,purpose,start_time,end_time,status
+B001,F001,U002,U002,Organic synthesis practical,2026-08-25 10:00:00,2026-08-25 12:00:00,confirmed
+B002,F004,U003,U003,ML lab session,2026-08-25 14:00:00,2026-08-25 16:00:00,confirmed
+B003,F002,U002,U002,Mechanics demo,2026-08-26 09:00:00,2026-08-26 11:00:00,confirmed
+B004,F003,U001,U001,Guest lecture,2026-08-26 15:00:00,2026-08-26 17:00:00,confirmed
+B005,F004,U004,U003,Student project work,2026-08-27 11:00:00,2026-08-27 13:00:00,confirmed
+B006,F001,U002,U002,Extra practical session,2026-08-28 10:00:00,2026-08-28 12:00:00,confirmed
+B007,F003,U002,U002,Department meeting,2026-08-24 09:00:00,2026-08-24 11:00:00,confirmed
+B008,F003,U003,U003,Recurring weekly slot,2026-08-20 09:00:00,2026-08-20 12:00:00,confirmed
+B009,F003,U003,U003,Recurring weekly slot,2026-08-13 09:00:00,2026-08-13 12:00:00,confirmed
+B010,F006,U009,U009,Prototype printing block,2026-08-22 09:00:00,2026-08-22 13:00:00,confirmed
+B011,F006,U009,U009,Prototype printing block,2026-08-15 09:00:00,2026-08-15 13:00:00,confirmed
+B012,F007,U003,U003,Data structures lab,2026-08-25 09:00:00,2026-08-25 11:00:00,confirmed
+B013,F007,U003,U003,Algorithms lab,2026-08-26 13:00:00,2026-08-26 15:00:00,confirmed
+B014,F008,U001,U001,Guest seminar,2026-08-27 10:00:00,2026-08-27 12:00:00,confirmed
+B015,F010,U002,U002,Inorganic titration practical,2026-08-24 14:00:00,2026-08-24 16:00:00,confirmed
+B016,F009,U009,U009,Materials stress testing,2026-08-23 10:00:00,2026-08-23 12:00:00,cancelled

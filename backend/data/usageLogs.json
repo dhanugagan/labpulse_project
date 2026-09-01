@@ -1,0 +1,12 @@
+[
+  { "log_id": "L001", "facility_id": "F001", "booking_id": "B001", "log_date": "2026-08-25", "hours_actually_used": 1.2, "headcount": 18, "logged_by": "U006", "source": "manual" },
+  { "log_id": "L002", "facility_id": "F004", "booking_id": "B002", "log_date": "2026-08-25", "hours_actually_used": 2.0, "headcount": 35, "logged_by": "U007", "source": "swipe" },
+  { "log_id": "L003", "facility_id": "F002", "booking_id": "B003", "log_date": "2026-08-26", "hours_actually_used": 0.3, "headcount": 4, "logged_by": "U002", "source": "manual" },
+  { "log_id": "L004", "facility_id": "F003", "booking_id": "B004", "log_date": "2026-08-26", "hours_actually_used": 2.0, "headcount": 85, "logged_by": "U001", "source": "manual" },
+  { "log_id": "L005", "facility_id": "F001", "booking_id": "B006", "log_date": "2026-08-28", "hours_actually_used": 0.0, "headcount": 0, "logged_by": "U006", "source": "manual" },
+  { "log_id": "L006", "facility_id": "F003", "booking_id": "B007", "log_date": "2026-08-24", "hours_actually_used": 0.5, "headcount": 6, "logged_by": "U001", "source": "manual" },
+  { "log_id": "L007", "facility_id": "F006", "booking_id": "B010", "log_date": "2026-08-22", "hours_actually_used": 1.5, "headcount": 3, "logged_by": "U007", "source": "manual" },
+  { "log_id": "L008", "facility_id": "F007", "booking_id": "B012", "log_date": "2026-08-25", "hours_actually_used": 1.8, "headcount": 38, "logged_by": "U007", "source": "swipe" },
+  { "log_id": "L009", "facility_id": "F008", "booking_id": "B014", "log_date": "2026-08-27", "hours_actually_used": 1.9, "headcount": 55, "logged_by": "U001", "source": "manual" },
+  { "log_id": "L010", "facility_id": "F010", "booking_id": "B015", "log_date": "2026-08-24", "hours_actually_used": 1.0, "headcount": 20, "logged_by": "U006", "source": "manual" }
+]

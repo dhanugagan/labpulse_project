@@ -1,0 +1,11 @@
+facility_id,name,type,capacity,department,status
+F001,Organic Chemistry Lab,lab,30,Chemistry,active
+F002,Physics Mechanics Lab,lab,25,Physics,active
+F003,Seminar Hall A,hall,100,Admin,active
+F004,Computer Lab 1,lab,40,Computer Science,active
+F005,Electronics Lab,lab,20,ECE,under_maintenance
+F006,3D Printing Studio,equipment,10,Mechanical,active
+F007,Computer Lab 2,lab,40,Computer Science,active
+F008,Seminar Hall B,hall,60,Admin,active
+F009,Materials Testing Lab,lab,15,Mechanical,active
+F010,Inorganic Chemistry Lab,lab,30,Chemistry,active

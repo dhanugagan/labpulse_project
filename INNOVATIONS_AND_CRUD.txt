@@ -1,0 +1,145 @@
+================================================================
+LABPULSE — CRUD COVERAGE & ADVANCED INNOVATION ADD-ONS
+Update log: full CRUD operations + new differentiators added
+for the final hackathon submission
+================================================================
+
+1. FULL CRUD COVERAGE (NEW)
+----------------------------------------------------------------
+Every resource in the system now supports complete Create, Read,
+Update, and Delete operations, enforced through the same
+role-based scope used everywhere else in the platform.
+
+USERS (NEW — admin only)
+  POST   /api/users            create a new account with role + scope
+  GET    /api/users            list all users
+  GET    /api/users/:id        view one user
+  PATCH  /api/users/:id        edit role, department, scope, active status
+  DELETE /api/users/:id        soft-deactivate (default) or ?hard=true
+                                to permanently remove
+
+FACILITIES
+  POST   /api/facilities       create a new facility (admin)
+  GET    /api/facilities       scoped list
+  GET    /api/facilities/:id   view one facility
+  PUT    /api/facilities/:id   full edit (admin)
+  PATCH  /api/facilities/:id/status   quick status flip
+                                (lab_incharge / maintenance / admin)
+  DELETE /api/facilities/:id   remove a facility (admin)
+
+BOOKINGS
+  POST   /api/bookings         create (direct confirm for faculty/
+                                lab_incharge/admin, pending approval
+                                for students)
+  GET    /api/bookings         scoped list
+  PUT    /api/bookings/:id     edit own booking (owner or admin)
+  PATCH  /api/bookings/:id/approve   approve a pending request
+  PATCH  /api/bookings/:id/reject    reject a pending request
+  DELETE /api/bookings/:id     cancel (owner or admin)
+
+USAGE LOGS
+  POST   /api/usage            log actual usage (lab_incharge/admin)
+  GET    /api/usage            scoped list
+  PUT    /api/usage/:id        correct a logged entry
+  DELETE /api/usage/:id        remove an incorrect entry
+
+MAINTENANCE
+  POST   /api/maintenance      report an issue (lab_incharge/faculty/
+                                admin) — auto-flags facility as
+                                under_maintenance if severity is
+                                high/critical
+  GET    /api/maintenance      scoped ticket queue
+  PATCH  /api/maintenance/:id  update status (maintenance/admin) —
+                                auto-reactivates the facility on
+                                resolution
+  DELETE /api/maintenance/:id  remove a duplicate/mistaken ticket
+                                (admin)
+
+Why this matters for judging: a system with only GET/POST is a
+read-only demo. Full CRUD, scoped by role at every verb, is what
+makes this deployable as an actual campus system rather than a
+hackathon toy — an admin can genuinely onboard staff, correct
+data-entry mistakes, and decommission a broken lab, all through
+the same access-controlled API Genie also reads from.
+
+2. NEW INNOVATIVE FEATURE: GHOST BOOKING DETECTION
+----------------------------------------------------------------
+Already wired into the Genie service (backend/services/
+genieService.js) and demoable today. A "ghost booking" is a
+confirmed reservation with zero recorded actual usage — the
+clearest, most damning evidence of the trust-based booking
+problem this project exists to solve. Ask Genie: "Which bookings
+are ghost bookings?" and it cross-references confirmed bookings
+against usage_logs in real time. This single feature is the
+most concrete, demoable proof of the "booking is a hypothesis,
+usage is the truth" thesis in the whole pitch — lead with it live.
+
+3. FURTHER INNOVATIONS TO PITCH (STRETCH ROADMAP)
+----------------------------------------------------------------
+These extend the working prototype's core idea and are strong
+talking points even where only sketched, not fully coded, in a
+12-hour window:
+
+a) PREDICTIVE UTILISATION FORECASTING
+   Feed historical booking + usage trends into a simple
+   regression or time-series model (or ask Genie itself, since
+   Genie Spaces can incorporate lightweight statistical
+   reasoning) to flag facilities likely to go idle next month
+   before it happens — shifting from reactive to proactive
+   facility planning.
+
+b) QR / NFC AUTO CHECK-IN
+   Replace manual usage logging with a QR code posted at each
+   lab entrance. Scanning on entry/exit writes directly to
+   usage_logs with zero lab-incharge effort, closing the last
+   manual step in the reconciliation loop and making usage data
+   as reliable as booking data.
+
+c) SLA-TIMED APPROVAL ESCALATION
+   Student approval requests that sit unactioned for a set
+   window auto-escalate to the department admin, so nothing
+   silently stalls in a lab incharge's queue.
+
+d) SUSTAINABILITY / ENERGY IMPACT LAYER
+   Tag facilities with approximate energy draw and let Genie
+   answer "how much energy did we waste on idle labs this
+   month" — ties directly into the "campus sustainability and
+   energy monitoring" track direction from the hackathon brief,
+   broadening LabPulse's relevance beyond pure facility ops.
+
+e) CROSS-DEPARTMENT REALLOCATION SUGGESTIONS
+   When Genie finds one department's lab idle and another
+   department's bookings are consistently rejected for lack of
+   space, have it proactively suggest a reallocation — turning
+   analytics into a recommendation engine, not just a report.
+
+f) CONVERSATIONAL ESCALATION VIA CHAT/SMS BOT
+   Wrap the existing Genie endpoint behind a WhatsApp or SMS
+   webhook so lab incharges without laptop access can report an
+   issue or check utilisation from a phone — meaningful for
+   real-world adoption where lab staff aren't always at a desk.
+
+g) AUDIT TRAIL DASHBOARD
+   Surface the genie_query_log table (already in schema.sql) as
+   an admin-only view showing exactly what every role asked and
+   what scope was applied — a strong "we thought about
+   governance and trust" answer if a judge asks about data
+   privacy or misuse.
+
+h) GAMIFIED RESOLUTION LEADERBOARD
+   A lightweight leaderboard ranking maintenance technicians by
+   fastest average ticket resolution time, encouraging faster
+   turnaround without any policy change — purely a UI/analytics
+   addition on data already being collected.
+
+4. HOW TO PITCH THIS UPGRADE IN THE DEMO
+----------------------------------------------------------------
+Open with: "This isn't a read-only dashboard — every role can
+create, edit, and delete the data they own, with the same
+access boundaries Genie itself respects." Then run the ghost
+booking query live as the single most memorable proof point,
+before walking through the CRUD flows (admin creating a user,
+lab incharge correcting a usage log, student cancelling their
+own booking) to show the system is a real, operable tool, not a
+static prototype.
+================================================================

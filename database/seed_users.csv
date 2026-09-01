@@ -1,0 +1,11 @@
+user_id,name,email,password,role,department,assigned_facility_ids,active,access_expires_at
+U001,Dr. Ananya Rao,admin@labpulse.edu,admin123,admin,,,TRUE,
+U002,Dr. Rakesh Iyer,rakesh.iyer@labpulse.edu,faculty123,faculty,Chemistry,,TRUE,
+U003,Priya Sen,priya.sen@labpulse.edu,faculty123,faculty,Computer Science,,TRUE,
+U004,Arjun Mehta,arjun.mehta@labpulse.edu,student123,student,Computer Science,,TRUE,
+U005,Sanya Kapoor,sanya.kapoor@labpulse.edu,student123,student,Chemistry,,TRUE,
+U006,Vikram Nair,vikram.nair@labpulse.edu,lab123,lab_incharge,Chemistry,F001,TRUE,
+U007,Meera Joshi,meera.joshi@labpulse.edu,lab123,lab_incharge,Computer Science,F004,TRUE,
+U008,Suresh Kumar,suresh.kumar@labpulse.edu,maint123,maintenance,,,TRUE,
+U009,Divya Menon,divya.menon@labpulse.edu,ops123,operations,,,TRUE,
+U010,Dr. James Carter,james.carter@labpulse.edu,guest123,guest,,F003,TRUE,2026-09-05 18:00:00

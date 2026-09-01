@@ -1,0 +1,9 @@
+[
+  { "equipment_id": "EQ001", "facility_id": "F001", "name": "Fume Hoods", "condition": "working" },
+  { "equipment_id": "EQ002", "facility_id": "F002", "name": "Fume Extractor", "condition": "faulty" },
+  { "equipment_id": "EQ003", "facility_id": "F004", "name": "40 PCs", "condition": "working" },
+  { "equipment_id": "EQ004", "facility_id": "F004", "name": "Projector", "condition": "working" },
+  { "equipment_id": "EQ005", "facility_id": "F003", "name": "AV System", "condition": "working" },
+  { "equipment_id": "EQ006", "facility_id": "F005", "name": "Oscilloscopes", "condition": "working" },
+  { "equipment_id": "EQ007", "facility_id": "F006", "name": "3D Printers x4", "condition": "working" }
+]

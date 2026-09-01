@@ -1,0 +1,5 @@
+ticket_id,facility_id,reported_by,assigned_to,issue,severity,reported_date,resolved_date,status
+T001,F002,U002,U008,Fume extractor fault,high,2026-08-20,,open
+T002,F005,U007,U008,Power outlet damaged,medium,2026-08-15,2026-08-22,resolved
+T003,F001,U006,U008,Water tap leaking near workstation 4,low,2026-08-27,,open
+T004,F008,U001,U008,AV system audio cutting out,medium,2026-08-21,,in_progress

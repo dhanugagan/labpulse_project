@@ -1,0 +1,6 @@
+[
+  { "ticket_id": "T001", "facility_id": "F002", "reported_by": "U002", "assigned_to": "U008", "issue": "Fume extractor fault", "severity": "high", "reported_date": "2026-08-20", "resolved_date": null, "status": "open" },
+  { "ticket_id": "T002", "facility_id": "F005", "reported_by": "U007", "assigned_to": "U008", "issue": "Power outlet damaged", "severity": "medium", "reported_date": "2026-08-15", "resolved_date": "2026-08-22", "status": "resolved" },
+  { "ticket_id": "T003", "facility_id": "F001", "reported_by": "U006", "assigned_to": "U008", "issue": "Water tap leaking near workstation 4", "severity": "low", "reported_date": "2026-08-27", "resolved_date": null, "status": "open" },
+  { "ticket_id": "T004", "facility_id": "F008", "reported_by": "U001", "assigned_to": "U008", "issue": "AV system audio cutting out", "severity": "medium", "reported_date": "2026-08-21", "resolved_date": null, "status": "in_progress" }
+]

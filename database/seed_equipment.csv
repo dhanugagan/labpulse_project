@@ -1,0 +1,8 @@
+equipment_id,facility_id,name,condition
+EQ001,F001,Fume Hoods,working
+EQ002,F002,Fume Extractor,faulty
+EQ003,F004,40 PCs,working
+EQ004,F004,Projector,working
+EQ005,F003,AV System,working
+EQ006,F005,Oscilloscopes,working
+EQ007,F006,3D Printers x4,working

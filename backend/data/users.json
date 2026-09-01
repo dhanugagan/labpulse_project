@@ -1,0 +1,12 @@
+[
+  { "user_id": "U001", "name": "Dr. Ananya Rao", "email": "admin@labpulse.edu", "password": "admin123", "role": "admin", "department": null, "assigned_facility_ids": [], "active": true },
+  { "user_id": "U002", "name": "Dr. Rakesh Iyer", "email": "rakesh.iyer@labpulse.edu", "password": "faculty123", "role": "faculty", "department": "Chemistry", "assigned_facility_ids": [], "active": true },
+  { "user_id": "U003", "name": "Priya Sen", "email": "priya.sen@labpulse.edu", "password": "faculty123", "role": "faculty", "department": "Computer Science", "assigned_facility_ids": [], "active": true },
+  { "user_id": "U004", "name": "Arjun Mehta", "email": "arjun.mehta@labpulse.edu", "password": "student123", "role": "student", "department": "Computer Science", "assigned_facility_ids": [], "active": true },
+  { "user_id": "U005", "name": "Sanya Kapoor", "email": "sanya.kapoor@labpulse.edu", "password": "student123", "role": "student", "department": "Chemistry", "assigned_facility_ids": [], "active": true },
+  { "user_id": "U006", "name": "Vikram Nair", "email": "vikram.nair@labpulse.edu", "password": "lab123", "role": "lab_incharge", "department": "Chemistry", "assigned_facility_ids": ["F001"], "active": true },
+  { "user_id": "U007", "name": "Meera Joshi", "email": "meera.joshi@labpulse.edu", "password": "lab123", "role": "lab_incharge", "department": "Computer Science", "assigned_facility_ids": ["F004"], "active": true },
+  { "user_id": "U008", "name": "Suresh Kumar", "email": "suresh.kumar@labpulse.edu", "password": "maint123", "role": "maintenance", "department": null, "assigned_facility_ids": [], "active": true },
+  { "user_id": "U009", "name": "Divya Menon", "email": "divya.menon@labpulse.edu", "password": "ops123", "role": "operations", "department": null, "assigned_facility_ids": [], "active": true },
+  { "user_id": "U010", "name": "Dr. James Carter", "email": "james.carter@labpulse.edu", "password": "guest123", "role": "guest", "department": null, "assigned_facility_ids": ["F003"], "active": true, "access_expires_at": "2026-09-05T18:00:00" }
+]

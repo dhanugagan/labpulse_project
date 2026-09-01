@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LabPulse — Genie-Powered Facility & Lab Utilisation Intelligence</title>
+<style>
+  :root{
+    --navy:#21295c; --deep:#065a82; --teal:#1c7293; --mint:#9fd8cb;
+    --ink:#1b1f2a; --muted:#5b6472; --offwhite:#f4f7f9; --border:#e1e6ec;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Calibri,Arial,sans-serif;background:var(--offwhite);color:var(--ink);}
+  .app-shell{display:flex;min-height:100vh;}
+  .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy),var(--deep));}
+  .login-card{background:#fff;padding:2.5rem;border-radius:12px;width:380px;box-shadow:0 12px 30px rgba(0,0,0,.25);}
+  .login-card h1{color:var(--navy);margin:0 0 .1rem;font-size:1.7rem;}
+  .login-card p.sub{color:var(--muted);margin:0 0 1.5rem;font-size:.9rem;}
+  .login-card select,.login-card input{width:100%;padding:.65rem .8rem;margin-bottom:.9rem;border:1px solid var(--border);border-radius:8px;font-size:.95rem;}
+  .login-card button{width:100%;padding:.7rem;background:var(--deep);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.95rem;}
+  .login-card button:hover{background:var(--navy);}
+  .login-error{color:#c0392b;font-size:.85rem;margin-bottom:.8rem;}
+  .demo-note{margin-top:1.1rem;font-size:.76rem;color:var(--muted);line-height:1.5;background:var(--offwhite);padding:.6rem .8rem;border-radius:8px;}
+  .sidebar{width:230px;background:var(--navy);color:#fff;padding:1.5rem 1rem;flex-shrink:0;}
+  .sidebar h2{font-size:1.2rem;margin:0 0 .2rem;}
+  .role-badge{display:inline-block;background:var(--teal);color:#fff;font-size:.7rem;padding:.15rem .5rem;border-radius:20px;margin-bottom:1.5rem;text-transform:capitalize;}
+  .sidebar nav a{display:block;color:#cadcfc;text-decoration:none;padding:.55rem .6rem;border-radius:6px;margin-bottom:.25rem;font-size:.9rem;cursor:pointer;}
+  .sidebar nav a.active,.sidebar nav a:hover{background:rgba(255,255,255,.12);}
+  .logout-btn{display:block;color:#cadcfc;background:none;border:none;padding:.55rem .6rem;font-size:.9rem;cursor:pointer;width:100%;text-align:left;}
+  .logout-btn:hover{background:rgba(255,255,255,.08);border-radius:6px;}
+  .main-content{flex:1;padding:2rem 2.5rem;overflow-y:auto;max-height:100vh;}
+  .page-title{font-size:1.6rem;color:var(--navy);margin:0 0 .3rem;}
+  .page-sub{color:var(--muted);margin:0 0 1.5rem;font-size:.9rem;}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem;box-shadow:0 2px 6px rgba(0,0,0,.04);}
+  .card h3{margin:0 0 .4rem;font-size:1rem;color:var(--navy);}
+  .card .stat{font-size:1.8rem;font-weight:700;color:var(--deep);}
+  .card .stat-label{font-size:.78rem;color:var(--muted);}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;margin-bottom:1rem;}
+  thead{background:var(--deep);color:#fff;}
+  th,td{text-align:left;padding:.6rem .8rem;font-size:.85rem;}
+  tbody tr:nth-child(even){background:var(--offwhite);}
+  tbody tr{border-bottom:1px solid var(--border);}
+  .badge{padding:.15rem .55rem;border-radius:20px;font-size:.7rem;font-weight:600;}
+  .badge.open,.badge.pending{background:#fde3d0;color:#a0521d;}
+  .badge.confirmed,.badge.resolved,.badge.active,.badge.healthy{background:#d7f0e6;color:#1e7d55;}
+  .badge.under_maintenance,.badge.in_progress,.badge.attention_required{background:#fde3d0;color:#a0521d;}
+  .badge.high,.badge.critical{background:#fbdada;color:#b02a2a;}
+  .badge.medium{background:#fdeecb;color:#92660c;}
+  .badge.low{background:#e3ecf5;color:#345680;}
+  .badge.cancelled,.badge.rejected{background:#f0f0f0;color:#777;}
+  .genie-panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin-top:1rem;}
+  .genie-panel h3{margin:0 0 .8rem;color:var(--navy);}
+  .genie-input-row{display:flex;gap:.5rem;margin-bottom:1rem;}
+  .genie-input-row input{flex:1;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.9rem;}
+  .genie-input-row button{padding:.6rem 1.1rem;background:var(--teal);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;}
+  .genie-answer{background:var(--offwhite);border-radius:8px;padding:.9rem 1rem;font-size:.88rem;}
+  .genie-answer .scope-tag{font-size:.7rem;color:var(--teal);font-weight:600;margin-bottom:.4rem;display:block;}
+  .genie-suggestions{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
+  .genie-suggestions button{background:var(--offwhite);border:1px solid var(--border);border-radius:20px;padding:.3rem .75rem;font-size:.76rem;cursor:pointer;}
+  .genie-suggestions button:hover{background:var(--mint);}
+  .section-title{font-size:1.1rem;color:var(--navy);margin:1.5rem 0 .7rem;}
+  .empty-state{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  .form-row{display:flex;gap:.6rem;margin-bottom:.8rem;flex-wrap:wrap;}
+  .form-row input,.form-row select{padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.86rem;}
+  .btn-primary{background:var(--deep);color:#fff;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;}
+  .btn-primary:hover{background:var(--navy);}
+  .bar-wrap{background:#e1e6ec;border-radius:6px;height:10px;width:100%;}
+  .bar-fill{height:100%;border-radius:6px;}
+  .cause-block{margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);}
+  .cause-block:last-child{border-bottom:none;}
+  .floating-genie-btn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:50;background:var(--teal);color:#fff;border:none;border-radius:50px;padding:.8rem 1.3rem;font-weight:600;font-size:.9rem;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+  .floating-genie-panel{position:fixed;bottom:5rem;right:1.5rem;width:380px;max-height:70vh;overflow-y:auto;z-index:50;background:#fff;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.3);padding:1rem;}
+  .banner{background:var(--navy);color:#fff;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.5rem;}
+  .banner h3{margin:0 0 .4rem;color:var(--mint);}
+  .banner p{margin:.2rem 0;font-size:.88rem;color:#cadcfc;}
+  .demo-flag{background:#fdeecb;color:#92660c;font-size:.72rem;padding:.3rem .7rem;border-radius:6px;margin-bottom:1rem;display:inline-block;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ============================================================
+   LABPULSE — STATIC DEMO BUILD (no backend, GitHub Pages ready)
+   RBAC, CRUD, and the analytics engine (utilisation, phantom
+   booking detection, root cause analysis, health scores, demand
+   intelligence) are reimplemented here as plain client-side JS
+   so this single file runs entirely in the browser. Data
+   persists in localStorage so CRUD actions feel real within
+   your own browser session.
+   ============================================================ */
+
+const SEED = {
+  users: [
+    { user_id:"U001", name:"Dr. Ananya Rao", email:"admin@labpulse.edu", password:"admin123", role:"admin", department:null, assigned_facility_ids:[], active:true },
+    { user_id:"U002", name:"Dr. Rakesh Iyer", email:"rakesh.iyer@labpulse.edu", password:"faculty123", role:"faculty", department:"Chemistry", assigned_facility_ids:[], active:true },
+    { user_id:"U003", name:"Priya Sen", email:"priya.sen@labpulse.edu", password:"faculty123", role:"faculty", department:"Computer Science", assigned_facility_ids:[], active:true },
+    { user_id:"U004", name:"Arjun Mehta", email:"arjun.mehta@labpulse.edu", password:"student123", role:"student", department:"Computer Science", assigned_facility_ids:[], active:true },
+    { user_id:"U005", name:"Sanya Kapoor", email:"sanya.kapoor@labpulse.edu", password:"student123", role:"student", department:"Chemistry", assigned_facility_ids:[], active:true },
+    { user_id:"U006", name:"Vikram Nair", email:"vikram.nair@labpulse.edu", password:"lab123", role:"lab_incharge", department:"Chemistry", assigned_facility_ids:["F001"], active:true },
+    { user_id:"U007", name:"Meera Joshi", email:"meera.joshi@labpulse.edu", password:"lab123", role:"lab_incharge", department:"Computer Science", assigned_facility_ids:["F004"], active:true },
+    { user_id:"U008", name:"Suresh Kumar", email:"suresh.kumar@labpulse.edu", password:"maint123", role:"maintenance", department:null, assigned_facility_ids:[], active:true },
+    { user_id:"U009", name:"Divya Menon", email:"divya.menon@labpulse.edu", password:"ops123", role:"operations", department:null, assigned_facility_ids:[], active:true }
+  ],
+  facilities: [
+    { facility_id:"F001", name:"Organic Chemistry Lab", type:"lab", capacity:30, department:"Chemistry", status:"active" },
+    { facility_id:"F002", name:"Physics Mechanics Lab", type:"lab", capacity:25, department:"Physics", status:"active" },
+    { facility_id:"F003", name:"Seminar Hall A", type:"hall", capacity:100, department:"Admin", status:"active" },
+    { facility_id:"F004", name:"Computer Lab 1", type:"lab", capacity:40, department:"Computer Science", status:"active" },
+    { facility_id:"F005", name:"Electronics Lab", type:"lab", capacity:20, department:"ECE", status:"under_maintenance" },
+    { facility_id:"F006", name:"3D Printing Studio", type:"equipment", capacity:10, department:"Mechanical", status:"active" },
+    { facility_id:"F007", name:"Computer Lab 2", type:"lab", capacity:40, department:"Computer Science", status:"active" },
+    { facility_id:"F008", name:"Seminar Hall B", type:"hall", capacity:60, department:"Admin", status:"active" },
+    { facility_id:"F009", name:"Materials Testing Lab", type:"lab", capacity:15, department:"Mechanical", status:"active" },
+    { facility_id:"F010", name:"Inorganic Chemistry Lab", type:"lab", capacity:30, department:"Chemistry", status:"active" }
+  ],
+  bookings: [
+    { booking_id:"B001", facility_id:"F001", requested_by:"U002", purpose:"Organic synthesis practical", start_time:"2026-08-25T10:00:00", end_time:"2026-08-25T12:00:00", status:"confirmed" },
+    { booking_id:"B002", facility_id:"F004", requested_by:"U003", purpose:"ML lab session", start_time:"2026-08-25T14:00:00", end_time:"2026-08-25T16:00:00", status:"confirmed" },
+    { booking_id:"B003", facility_id:"F002", requested_by:"U002", purpose:"Mechanics demo", start_time:"2026-08-26T09:00:00", end_time:"2026-08-26T11:00:00", status:"confirmed" },
+    { booking_id:"B004", facility_id:"F003", requested_by:"U001", purpose:"Guest lecture", start_time:"2026-08-26T15:00:00", end_time:"2026-08-26T17:00:00", status:"confirmed" },
+    { booking_id:"B005", facility_id:"F004", requested_by:"U004", purpose:"Student project work", start_time:"2026-08-27T11:00:00", end_time:"2026-08-27T13:00:00", status:"confirmed" },
+    { booking_id:"B006", facility_id:"F001", requested_by:"U002", purpose:"Extra practical session", start_time:"2026-08-28T10:00:00", end_time:"2026-08-28T12:00:00", status:"confirmed" },
+    { booking_id:"B007", facility_id:"F003", requested_by:"U002", purpose:"Department meeting", start_time:"2026-08-24T09:00:00", end_time:"2026-08-24T11:00:00", status:"confirmed" },
+    { booking_id:"B008", facility_id:"F003", requested_by:"U003", purpose:"Recurring weekly slot", start_time:"2026-08-20T09:00:00", end_time:"2026-08-20T12:00:00", status:"confirmed" },
+    { booking_id:"B009", facility_id:"F003", requested_by:"U003", purpose:"Recurring weekly slot", start_time:"2026-08-13T09:00:00", end_time:"2026-08-13T12:00:00", status:"confirmed" },
+    { booking_id:"B010", facility_id:"F006", requested_by:"U009", purpose:"Prototype printing block", start_time:"2026-08-22T09:00:00", end_time:"2026-08-22T13:00:00", status:"confirmed" },
+    { booking_id:"B011", facility_id:"F006", requested_by:"U009", purpose:"Prototype printing block", start_time:"2026-08-15T09:00:00", end_time:"2026-08-15T13:00:00", status:"confirmed" },
+    { booking_id:"B012", facility_id:"F007", requested_by:"U003", purpose:"Data structures lab", start_time:"2026-08-25T09:00:00", end_time:"2026-08-25T11:00:00", status:"confirmed" },
+    { booking_id:"B013", facility_id:"F007", requested_by:"U003", purpose:"Algorithms lab", start_time:"2026-08-26T13:00:00", end_time:"2026-08-26T15:00:00", status:"confirmed" },
+    { booking_id:"B014", facility_id:"F008", requested_by:"U001", purpose:"Guest seminar", start_time:"2026-08-27T10:00:00", end_time:"2026-08-27T12:00:00", status:"confirmed" },
+    { booking_id:"B015", facility_id:"F010", requested_by:"U002", purpose:"Inorganic titration practical", start_time:"2026-08-24T14:00:00", end_time:"2026-08-24T16:00:00", status:"confirmed" },
+    { booking_id:"B016", facility_id:"F009", requested_by:"U009", purpose:"Materials stress testing", start_time:"2026-08-23T10:00:00", end_time:"2026-08-23T12:00:00", status:"cancelled" }
+  ],
+  usageLogs: [
+    { log_id:"L001", facility_id:"F001", booking_id:"B001", hours_actually_used:1.2, headcount:18 },
+    { log_id:"L002", facility_id:"F004", booking_id:"B002", hours_actually_used:2.0, headcount:35 },
+    { log_id:"L003", facility_id:"F002", booking_id:"B003", hours_actually_used:0.3, headcount:4 },
+    { log_id:"L004", facility_id:"F003", booking_id:"B004", hours_actually_used:2.0, headcount:85 },
+    { log_id:"L005", facility_id:"F001", booking_id:"B006", hours_actually_used:0.0, headcount:0 },
+    { log_id:"L006", facility_id:"F003", booking_id:"B007", hours_actually_used:0.5, headcount:6 },
+    { log_id:"L007", facility_id:"F006", booking_id:"B010", hours_actually_used:1.5, headcount:3 },
+    { log_id:"L008", facility_id:"F007", booking_id:"B012", hours_actually_used:1.8, headcount:38 },
+    { log_id:"L009", facility_id:"F008", booking_id:"B014", hours_actually_used:1.9, headcount:55 },
+    { log_id:"L010", facility_id:"F010", booking_id:"B015", hours_actually_used:1.0, headcount:20 }
+  ],
+  maintenance: [
+    { ticket_id:"T001", facility_id:"F002", issue:"Fume extractor fault", severity:"high", reported_date:"2026-08-20", status:"open" },
+    { ticket_id:"T002", facility_id:"F005", issue:"Power outlet damaged", severity:"medium", reported_date:"2026-08-15", resolved_date:"2026-08-22", status:"resolved" },
+    { ticket_id:"T003", facility_id:"F001", issue:"Water tap leaking near workstation 4", severity:"low", reported_date:"2026-08-27", status:"open" },
+    { ticket_id:"T004", facility_id:"F008", issue:"AV system audio cutting out", severity:"medium", reported_date:"2026-08-21", status:"in_progress" }
+  ]
+};
+
+const DB_KEY = "labpulse_demo_db_v1";
+function loadDB(){
+  const raw = localStorage.getItem(DB_KEY);
+  if(raw) return JSON.parse(raw);
+  const fresh = JSON.parse(JSON.stringify(SEED));
+  localStorage.setItem(DB_KEY, JSON.stringify(fresh));
+  return fresh;
+}
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+let DB = loadDB();
+function resetDemoData(){ localStorage.removeItem(DB_KEY); DB = loadDB(); render(); }
+
+function getSession(){ const raw = localStorage.getItem("labpulse_demo_session"); return raw ? JSON.parse(raw) : null; }
+function setSession(user){ localStorage.setItem("labpulse_demo_session", JSON.stringify(user)); }
+function clearSession(){ localStorage.removeItem("labpulse_demo_session"); }
+
+function applyScope(user){
+  switch(user.role){
+    case "admin": case "operations": return {type:"all"};
+    case "faculty": return {type:"department", value:user.department, ownBookingsOnly:true};
+    case "student": return {type:"availability_only", value:user.department};
+    case "lab_incharge": return {type:"facility_list", value:user.assigned_facility_ids||[]};
+    case "maintenance": return {type:"maintenance_only"};
+    default: return {type:"none"};
+  }
+}
+function scopedFacilityIds(user){
+  const scope = applyScope(user);
+  if(scope.type==="all") return null;
+  if(scope.type==="facility_list") return scope.value||[];
+  if(scope.type==="department" || scope.type==="availability_only"){
+    return DB.facilities.filter(f=>f.department===(scope.value||user.department)).map(f=>f.facility_id);
+  }
+  return [];
+}
+
+function hoursBetween(s,e){ return (new Date(e)-new Date(s))/3600000; }
+function facilityLookup(){ return Object.fromEntries(DB.facilities.map(f=>[f.facility_id,f])); }
+
+function utilisationReport(facilityIds){
+  const scoped = facilityIds ? DB.facilities.filter(f=>facilityIds.includes(f.facility_id)) : DB.facilities;
+  const bookings = DB.bookings.filter(b=>b.status==="confirmed");
+  return scoped.map(f=>{
+    const fBookings = bookings.filter(b=>b.facility_id===f.facility_id);
+    const bookedHours = fBookings.reduce((s,b)=>s+hoursBetween(b.start_time,b.end_time),0);
+    const fUsage = DB.usageLogs.filter(u=>u.facility_id===f.facility_id);
+    const usedHours = fUsage.reduce((s,u)=>s+u.hours_actually_used,0);
+    const utilisation_pct = bookedHours>0 ? Math.round((usedHours/bookedHours)*100) : null;
+    return {facility_id:f.facility_id, facility:f.name, department:f.department, status:f.status,
+      booked_hours:Math.round(bookedHours*10)/10, used_hours:Math.round(usedHours*10)/10, utilisation_pct};
+  });
+}
+
+function phantomBookingReport(facilityIds){
+  const lookup = facilityLookup();
+  const bookings = DB.bookings.filter(b=>b.status==="confirmed");
+  const scoped = facilityIds ? bookings.filter(b=>facilityIds.includes(b.facility_id)) : bookings;
+  const rows = scoped.map(b=>{
+    const usage = DB.usageLogs.find(u=>u.booking_id===b.booking_id);
+    const bookedHours = hoursBetween(b.start_time,b.end_time);
+    const usedHours = usage ? usage.hours_actually_used : 0;
+    const wastedHours = Math.max(bookedHours-usedHours,0);
+    let status = usedHours===0 ? "unused" : usedHours<bookedHours*0.5 ? "partially_used" : "fully_used";
+    return {booking_id:b.booking_id, facility:lookup[b.facility_id]?.name, facility_id:b.facility_id,
+      purpose:b.purpose, booked_hours:Math.round(bookedHours*10)/10, used_hours:Math.round(usedHours*10)/10,
+      wasted_hours:Math.round(wastedHours*10)/10, status};
+  });
+  const totalBookedHours = rows.reduce((s,r)=>s+r.booked_hours,0);
+  const totalWastedHours = rows.reduce((s,r)=>s+r.wasted_hours,0);
+  const unusedCount = rows.filter(r=>r.status==="unused").length;
+  return {
+    summary:{total_bookings_analysed:rows.length, unused_bookings:unusedCount,
+      phantom_rate_pct: rows.length>0?Math.round((unusedCount/rows.length)*100):0,
+      total_wasted_hours:Math.round(totalWastedHours*10)/10, total_booked_hours:Math.round(totalBookedHours*10)/10},
+    bookings: rows.filter(r=>r.status!=="fully_used")
+  };
+}
+
+function rootCauseAnalysis(facilityId){
+  const facility = DB.facilities.find(f=>f.facility_id===facilityId);
+  if(!facility) return {error:"Facility not found"};
+  const util = utilisationReport([facilityId])[0];
+  const maintenance = DB.maintenance.filter(m=>m.facility_id===facilityId);
+  const openTickets = maintenance.filter(m=>m.status!=="resolved");
+  const phantom = phantomBookingReport([facilityId]);
+  const bookings = DB.bookings.filter(b=>b.facility_id===facilityId);
+  const cancelledCount = bookings.filter(b=>b.status==="cancelled").length;
+  const confirmedCount = bookings.filter(b=>b.status==="confirmed").length;
+  const causes = [];
+  if(openTickets.length>0){
+    causes.push({cause:"Maintenance problem", evidence:`${openTickets.length} unresolved issue(s): ${openTickets.map(t=>t.issue).join("; ")}`,
+      recommended_action:"Prioritise resolving the open maintenance ticket(s) before reallocating this facility."});
+  }
+  if(phantom.summary.unused_bookings>0 && phantom.summary.phantom_rate_pct>=30){
+    causes.push({cause:"Scheduling problem (high bookings, low attendance)",
+      evidence:`${phantom.summary.unused_bookings} of ${phantom.summary.total_bookings_analysed} confirmed bookings had zero recorded usage (${phantom.summary.phantom_rate_pct}% phantom rate).`,
+      recommended_action:"Review recurring reservations and confirm real demand before re-approving them."});
+  }
+  if(confirmedCount<=2 && util.utilisation_pct!==null){
+    causes.push({cause:"Low demand", evidence:`Only ${confirmedCount} confirmed booking(s) found for this facility.`,
+      recommended_action:"Consider promoting this facility's availability or reassigning it to a higher-demand department."});
+  }
+  if(cancelledCount>0){
+    causes.push({cause:"Repeated cancellations", evidence:`${cancelledCount} booking(s) for this facility were cancelled.`,
+      recommended_action:"Investigate whether cancellations cluster around a specific time slot or requester."});
+  }
+  if(causes.length===0){
+    causes.push({cause:"No significant issue detected", evidence:"Utilisation, maintenance, and booking patterns all look healthy.", recommended_action:"No action needed."});
+  }
+  return {facility:facility.name, facility_id:facilityId, utilisation_pct:util.utilisation_pct, causes};
+}
+
+function healthScores(facilityIds){
+  const scoped = facilityIds ? DB.facilities.filter(f=>facilityIds.includes(f.facility_id)) : DB.facilities;
+  return scoped.map(f=>{
+    const util = utilisationReport([f.facility_id])[0];
+    const phantom = phantomBookingReport([f.facility_id]).summary;
+    const openTickets = DB.maintenance.filter(m=>m.facility_id===f.facility_id && m.status!=="resolved").length;
+    const utilisationScore = util.utilisation_pct!==null ? Math.min(util.utilisation_pct,100) : 50;
+    const maintenanceFactor = Math.max(0,100-openTickets*30);
+    const phantomFactor = Math.max(0,100-phantom.phantom_rate_pct);
+    let score = Math.round(0.5*utilisationScore + 0.3*phantomFactor + 0.2*maintenanceFactor);
+    score = Math.max(0,Math.min(100,score));
+    let tier = score>=70?"healthy":score>=40?"attention_required":"critical";
+    return {facility_id:f.facility_id, facility:f.name, health_score:score, tier,
+      utilisation_pct:util.utilisation_pct, open_maintenance_tickets:openTickets, phantom_booking_rate_pct:phantom.phantom_rate_pct};
+  });
+}
+
+function demandIntelligence(){
+  const lookup = facilityLookup();
+  const bookings = DB.bookings.filter(b=>b.status==="confirmed");
+  const countByFacility={}, hourCounts={}, deptCounts={};
+  bookings.forEach(b=>{
+    countByFacility[b.facility_id]=(countByFacility[b.facility_id]||0)+1;
+    const hour = new Date(b.start_time).getHours();
+    hourCounts[hour]=(hourCounts[hour]||0)+1;
+    const dept = lookup[b.facility_id]?.department;
+    if(dept) deptCounts[dept]=(deptCounts[dept]||0)+1;
+  });
+  const ranked = Object.entries(countByFacility).map(([facility_id,count])=>({facility_id,facility:lookup[facility_id]?.name,bookings:count})).sort((a,b)=>b.bookings-a.bookings);
+  const peakHour = Object.entries(hourCounts).sort((a,b)=>b[1]-a[1])[0];
+  return {
+    most_requested: ranked.slice(0,3),
+    peak_hour: peakHour ? `${peakHour[0]}:00 - ${parseInt(peakHour[0])+1}:00` : "Not enough data",
+    department_demand: Object.entries(deptCounts).map(([department,count])=>({department,bookings:count})).sort((a,b)=>b.bookings-a.bookings)
+  };
+}
+
+function executiveInsight(){
+  const phantom = phantomBookingReport();
+  const util = utilisationReport();
+  const worst = [...util].filter(u=>u.utilisation_pct!==null).sort((a,b)=>a.utilisation_pct-b.utilisation_pct)[0];
+  const worstPhantom = worst ? phantomBookingReport([worst.facility_id]) : null;
+  const overallPct = phantom.summary.total_booked_hours>0 ? Math.round((phantom.summary.total_wasted_hours/phantom.summary.total_booked_hours)*100) : 0;
+  return {
+    headline:`Across ${util.length} facilities, ${overallPct}% of booked hours were unused, representing approximately ${phantom.summary.total_wasted_hours} hours of potentially recoverable capacity.`,
+    detail: worst ? `The largest contributor was ${worst.facility}, at ${worst.utilisation_pct}% utilisation, with ${worstPhantom.summary.unused_bookings} unused reservation(s) out of ${worstPhantom.summary.total_bookings_analysed}.` : "Not enough data yet.",
+    recommendation: worst ? `Review recurring reservations for ${worst.facility} and prioritise resolving any open maintenance tickets affecting it.` : "Continue monitoring."
+  };
+}
+
+function askGenie(user, question){
+  const scope = applyScope(user);
+  const q = question.toLowerCase();
+  if(scope.type==="none") return {answer:"Your role does not have access to this data.", data:[]};
+
+  if(q.includes("ghost") || q.includes("phantom") || q.includes("never used") || q.includes("no show")){
+    if(scope.type==="availability_only") return {answer:"Ghost booking detection is not available for the student role.", data:[]};
+    const rep = phantomBookingReport(scope.type==="all"?null:scopedFacilityIds(user));
+    return {answer:`${rep.summary.unused_bookings} ghost booking(s) found out of ${rep.summary.total_bookings_analysed} confirmed bookings (${rep.summary.phantom_rate_pct}% phantom rate).`, data:rep.bookings};
+  }
+  if(q.includes("underutil") || q.includes("idle")){
+    if(scope.type==="availability_only") return {answer:"Utilisation analytics are not available for the student role.", data:[]};
+    const rep = utilisationReport(scope.type==="all"?null:scopedFacilityIds(user)).filter(r=>r.utilisation_pct!==null && r.utilisation_pct<20).sort((a,b)=>a.utilisation_pct-b.utilisation_pct);
+    return {answer: rep.length? `${rep.length} facility(ies) in your scope are underutilised (below 20%).` : "No underutilised facilities found in your scope.", data:rep};
+  }
+  if(q.includes("maintenance") || q.includes("issue") || q.includes("broken") || q.includes("fault")){
+    if(scope.type==="availability_only") return {answer:"Maintenance details are not available for the student role.", data:[]};
+    const ids = scope.type==="all"?null:scopedFacilityIds(user);
+    const rows = DB.maintenance.filter(m=>!ids || ids.includes(m.facility_id)).map(m=>({facility:facilityLookup()[m.facility_id]?.name, issue:m.issue, severity:m.severity, status:m.status}));
+    return {answer: rows.length? `${rows.length} maintenance record(s) found in your scope.` : "No maintenance issues found in your scope.", data:rows};
+  }
+  if(q.includes("health")){
+    if(scope.type==="availability_only") return {answer:"Health scores are not available for the student role.", data:[]};
+    const rows = healthScores(scope.type==="all"?null:scopedFacilityIds(user));
+    return {answer:`Health scores computed for ${rows.length} facility(ies) in your scope.`, data:rows};
+  }
+  if(q.includes("free") || q.includes("available")){
+    const ids = scope.type==="all"?null:scopedFacilityIds(user);
+    const rows = DB.facilities.filter(f=>(!ids||ids.includes(f.facility_id)) && f.status==="active").map(f=>{
+      const active = DB.bookings.filter(b=>b.facility_id===f.facility_id && b.status==="confirmed").length;
+      return {facility:f.name, facility_id:f.facility_id, upcoming_bookings:active};
+    });
+    return {answer:`${rows.length} facility(ies) checked for availability in your scope.`, data:rows};
+  }
+  if(scope.type==="availability_only") return {answer:"Only availability questions are supported for the student role.", data:[]};
+  const ids = scope.type==="all"?null:scopedFacilityIds(user);
+  const rows = DB.facilities.filter(f=>!ids||ids.includes(f.facility_id)).map(f=>({facility:f.name, facility_id:f.facility_id, status:f.status}));
+  return {answer:"Here is a summary of facilities within your scope.", data:rows};
+}
+
+function createBooking(user, payload){
+  const facility = DB.facilities.find(f=>f.facility_id===payload.facility_id);
+  if(!facility) return {ok:false, msg:"Facility not found"};
+  if(facility.status!=="active") return {ok:false, msg:"Facility is currently unavailable (under maintenance)"};
+  const id = "B"+Math.random().toString(36).slice(2,8).toUpperCase();
+  const status = ["faculty","lab_incharge","admin"].includes(user.role) ? "confirmed" : "pending";
+  DB.bookings.push({booking_id:id, facility_id:payload.facility_id, requested_by:user.user_id, purpose:payload.purpose, start_time:payload.start_time, end_time:payload.end_time, status});
+  saveDB(DB);
+  return {ok:true, msg: status==="confirmed" ? "Booking confirmed" : "Request submitted for approval"};
+}
+function cancelBooking(user, bookingId){
+  const b = DB.bookings.find(x=>x.booking_id===bookingId);
+  if(!b) return {ok:false, msg:"Not found"};
+  if(user.role!=="admin" && b.requested_by!==user.user_id) return {ok:false, msg:"Not your booking"};
+  b.status="cancelled"; saveDB(DB);
+  return {ok:true, msg:"Booking cancelled"};
+}
+function logUsage(user, payload){
+  const id = "L"+Math.random().toString(36).slice(2,8).toUpperCase();
+  DB.usageLogs.push({log_id:id, facility_id:payload.facility_id, booking_id:payload.booking_id||null, hours_actually_used:parseFloat(payload.hours_actually_used), headcount:parseInt(payload.headcount)});
+  saveDB(DB);
+  return {ok:true, msg:"Usage logged"};
+}
+function reportIssue(user, payload){
+  const id = "T"+Math.random().toString(36).slice(2,8).toUpperCase();
+  DB.maintenance.push({ticket_id:id, facility_id:payload.facility_id, issue:payload.issue, severity:payload.severity, reported_date:new Date().toISOString().slice(0,10), status:"open"});
+  if(["high","critical"].includes(payload.severity)){
+    const f = DB.facilities.find(x=>x.facility_id===payload.facility_id);
+    if(f) f.status="under_maintenance";
+  }
+  saveDB(DB);
+  return {ok:true, msg:"Maintenance ticket created"};
+}
+function updateTicketStatus(ticketId, status){
+  const t = DB.maintenance.find(x=>x.ticket_id===ticketId);
+  if(!t) return;
+  t.status=status;
+  if(status==="resolved"){
+    t.resolved_date=new Date().toISOString().slice(0,10);
+    const f = DB.facilities.find(x=>x.facility_id===t.facility_id);
+    if(f) f.status="active";
+  }
+  saveDB(DB);
+}
+function createUser(payload){
+  const id = "U"+Math.random().toString(36).slice(2,8).toUpperCase();
+  DB.users.push({user_id:id, name:payload.name, email:payload.email, password:payload.password, role:payload.role, department:payload.department||null, assigned_facility_ids:[], active:true});
+  saveDB(DB);
+}
+function toggleUserActive(userId){
+  const u = DB.users.find(x=>x.user_id===userId);
+  if(u){ u.active=!u.active; saveDB(DB); }
+}
+
+const root = document.getElementById("root");
+let currentPage = "home";
+
+function esc(s){ return (s===undefined||s===null) ? "" : String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function render(){
+  const user = getSession();
+  if(!user){ renderLogin(); return; }
+  renderApp(user);
+}
+
+function renderLogin(){
+  root.innerHTML = `
+    <div class="login-page">
+      <div class="login-card">
+        <h1>LabPulse</h1>
+        <p class="sub">Genie-powered facility & lab intelligence — static demo build</p>
+        <div id="loginError"></div>
+        <form id="loginForm">
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <button type="submit">Sign in</button>
+        </form>
+        <div class="demo-note">
+          <strong>Demo accounts</strong><br/>
+          admin@labpulse.edu / admin123 (Admin)<br/>
+          rakesh.iyer@labpulse.edu / faculty123 (Faculty)<br/>
+          arjun.mehta@labpulse.edu / student123 (Student)<br/>
+          vikram.nair@labpulse.edu / lab123 (Lab Incharge)<br/>
+          suresh.kumar@labpulse.edu / maint123 (Maintenance)<br/>
+          divya.menon@labpulse.edu / ops123 (Operations)<br/><br/>
+          This is a fully static, backend-free build for GitHub Pages —
+          all data lives in your browser's localStorage.
+          <a href="#" id="resetLink" style="color:#065a82;">Reset demo data</a>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("loginForm").addEventListener("submit", e=>{
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const pw = document.getElementById("loginPassword").value;
+    const user = DB.users.find(u=>u.email===email && u.password===pw);
+    if(!user){ document.getElementById("loginError").innerHTML = `<p class="login-error">Invalid email or password</p>`; return; }
+    if(!user.active){ document.getElementById("loginError").innerHTML = `<p class="login-error">This account has been deactivated</p>`; return; }
+    setSession(user);
+    currentPage="home";
+    render();
+  });
+  document.getElementById("resetLink").addEventListener("click", e=>{ e.preventDefault(); resetDemoData(); });
+}
+
+const NAV_ITEMS = [
+  {id:"home", label:"🏠 Dashboard", roles:["admin","faculty","student","lab_incharge","maintenance","operations"]},
+  {id:"facilities", label:"🔍 Facilities", roles:["admin","faculty","student","lab_incharge","operations"]},
+  {id:"map", label:"🗺️ Campus Map", roles:["admin","faculty","student","lab_incharge","operations"]},
+  {id:"analytics", label:"📊 Analytics", roles:["admin","faculty","lab_incharge","operations"]},
+  {id:"admin", label:"⚙️ Administration", roles:["admin"]}
+];
+
+function renderApp(user){
+  const nav = NAV_ITEMS.filter(n=>n.roles.includes(user.role));
+  root.innerHTML = `
+    <div class="app-shell">
+      <aside class="sidebar">
+        <h2>LabPulse</h2>
+        <span class="role-badge">${esc(user.role.replace("_"," "))}</span>
+        <nav>${nav.map(n=>`<a data-page="${n.id}" class="${currentPage===n.id?'active':''}">${n.label}</a>`).join("")}</nav>
+        <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.15);">
+          <p style="color:#cadcfc;font-size:.85rem;margin:0 0 .3rem;">${esc(user.name)}</p>
+          ${user.department?`<p style="color:#9fd8cb;font-size:.75rem;margin:0 0 .8rem;">${esc(user.department)}</p>`:""}
+          <button class="logout-btn" id="logoutBtn">⎋ Log out</button>
+        </div>
+      </aside>
+      <main class="main-content" id="mainContent"></main>
+    </div>
+    <button class="floating-genie-btn" id="floatBtn">🤖 Ask LabPulse Genie</button>
+    <div id="floatPanel"></div>
+  `;
+  document.querySelectorAll(".sidebar nav a").forEach(a=>{
+    a.addEventListener("click", ()=>{ currentPage = a.dataset.page; renderApp(user); });
+  });
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{ clearSession(); render(); });
+  document.getElementById("floatBtn").addEventListener("click", ()=>{
+    const panel = document.getElementById("floatPanel");
+    if(panel.innerHTML){ panel.innerHTML=""; return; }
+    panel.innerHTML = `<div class="floating-genie-panel">${genieChatHTML("floatGenie")}</div>`;
+    wireGenieChat("floatGenie", user);
+  });
+
+  const main = document.getElementById("mainContent");
+  if(currentPage==="home") main.innerHTML = renderHome(user);
+  else if(currentPage==="facilities") main.innerHTML = renderFacilities(user);
+  else if(currentPage==="map") main.innerHTML = renderMap(user);
+  else if(currentPage==="analytics") main.innerHTML = renderAnalytics(user);
+  else if(currentPage==="admin") main.innerHTML = renderAdmin(user);
+
+  wirePageEvents(user);
+}
+
+function genieChatHTML(id){
+  return `
+    <h3 style="margin:0 0 .8rem;color:var(--navy);">🤖 Ask Genie</h3>
+    <div class="genie-suggestions" id="${id}_sugg">
+      <button data-q="Which labs are free tomorrow at 2 PM?">Which labs are free?</button>
+      <button data-q="Which facilities are underutilised?">Underutilised facilities</button>
+      <button data-q="Show phantom bookings">Phantom bookings</button>
+      <button data-q="Show maintenance issues">Maintenance issues</button>
+    </div>
+    <div class="genie-input-row">
+      <input id="${id}_input" placeholder="Ask a question in plain English..." />
+      <button id="${id}_ask">Ask</button>
+    </div>
+    <div id="${id}_answer"></div>
+  `;
+}
+function wireGenieChat(id, user){
+  const input = document.getElementById(`${id}_input`);
+  const askBtn = document.getElementById(`${id}_ask`);
+  const answerBox = document.getElementById(`${id}_answer`);
+  function run(q){
+    if(!q || !q.trim()) return;
+    input.value = q;
+    const result = askGenie(user, q);
+    const scope = applyScope(user);
+    let tableHTML = "";
+    if(Array.isArray(result.data) && result.data.length>0){
+      const headers = Object.keys(result.data[0]);
+      tableHTML = `<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>
+        ${result.data.map(row=>`<tr>${headers.map(h=>`<td>${esc(row[h])}</td>`).join("")}</tr>`).join("")}
+      </tbody></table>`;
+    }
+    answerBox.innerHTML = `
+      <div class="genie-answer">
+        <span class="scope-tag">Scope applied: ${esc(scope.type)}${scope.value?` (${esc(JSON.stringify(scope.value))})`:""}</span>
+        <p style="margin:0 0 .6rem;">${esc(result.answer)}</p>
+        ${tableHTML}
+      </div>`;
+  }
+  askBtn.addEventListener("click", ()=>run(input.value));
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter") run(input.value); });
+  document.querySelectorAll(`#${id}_sugg button`).forEach(b=>b.addEventListener("click", ()=>run(b.dataset.q)));
+}
+
+function renderHome(user){
+  const ids = scopedFacilityIds(user);
+  const myFacilities = ids ? DB.facilities.filter(f=>ids.includes(f.facility_id)) : DB.facilities;
+  const myBookings = DB.bookings.filter(b=>{
+    if(user.role==="faculty") return b.requested_by===user.user_id;
+    if(user.role==="lab_incharge") return ids.includes(b.facility_id);
+    if(user.role==="student") return ids.includes(b.facility_id);
+    return true;
+  });
+
+  let body = "";
+  if(user.role==="admin" || user.role==="operations"){
+    const openTickets = DB.maintenance.filter(t=>t.status!=="resolved").length;
+    body = `
+      <div class="card-grid">
+        <div class="card"><div class="stat">${DB.facilities.length}</div><div class="stat-label">Total facilities</div></div>
+        <div class="card"><div class="stat">${DB.bookings.filter(b=>b.status==="confirmed").length}</div><div class="stat-label">Confirmed bookings</div></div>
+        <div class="card"><div class="stat">${openTickets}</div><div class="stat-label">Open maintenance tickets</div></div>
+        <div class="card"><div class="stat">${DB.users.filter(u=>u.active).length}</div><div class="stat-label">Active users</div></div>
+      </div>
+      <h2 class="section-title">All Facilities</h2>
+      ${facilitiesTable(DB.facilities)}`;
+  } else if(user.role==="faculty"){
+    body = `
+      <h2 class="section-title">Book a Facility</h2>
+      ${bookingForm(myFacilities)}
+      <h2 class="section-title">Your Bookings</h2>
+      ${bookingsTable(myBookings, true)}`;
+  } else if(user.role==="student"){
+    body = `
+      <h2 class="section-title">Facilities in Your Department</h2>
+      ${facilitiesTable(myFacilities)}
+      <h2 class="section-title">Request Access</h2>
+      <p class="page-sub">Requests route to your faculty or lab incharge for approval.</p>
+      ${bookingForm(myFacilities)}`;
+  } else if(user.role==="lab_incharge"){
+    body = `
+      <p class="page-sub">Managing: ${myFacilities.map(f=>f.name).join(", ")||"—"}</p>
+      <h2 class="section-title">Booking Calendar</h2>
+      ${bookingsTable(DB.bookings.filter(b=>ids.includes(b.facility_id)), false)}
+      <h2 class="section-title">Log Actual Usage</h2>
+      ${usageForm(myFacilities)}
+      <h2 class="section-title">Report Equipment Issue</h2>
+      ${issueForm(myFacilities)}
+      <h2 class="section-title">Maintenance Tickets on Your Labs</h2>
+      ${maintenanceTable(DB.maintenance.filter(t=>ids.includes(t.facility_id)), false)}`;
+  } else if(user.role==="maintenance"){
+    const tickets = DB.maintenance;
+    body = `
+      <div class="card-grid">
+        <div class="card"><div class="stat">${tickets.filter(t=>t.status==="open").length}</div><div class="stat-label">Open</div></div>
+        <div class="card"><div class="stat">${tickets.filter(t=>t.status==="in_progress").length}</div><div class="stat-label">In progress</div></div>
+        <div class="card"><div class="stat">${tickets.filter(t=>t.status==="resolved").length}</div><div class="stat-label">Resolved</div></div>
+      </div>
+      <h2 class="section-title">Ticket Queue</h2>
+      ${maintenanceTable(tickets, true)}`;
+  }
+
+  return `
+    <h1 class="page-title">${roleTitle(user.role)}</h1>
+    <p class="page-sub">${roleSub(user)}</p>
+    ${body}
+    <div class="genie-panel">${genieChatHTML("homeGenie")}</div>
+  `;
+}
+function roleTitle(role){
+  return {admin:"Admin Overview", operations:"Operations Analytics", faculty:"Faculty Dashboard",
+    student:"Student Dashboard", lab_incharge:"Lab Incharge Dashboard", maintenance:"Maintenance Queue"}[role] || "Dashboard";
+}
+function roleSub(user){
+  if(user.role==="faculty") return `Book facilities in your department (${esc(user.department)}) and track your reservations.`;
+  if(user.role==="student") return `Check availability for ${esc(user.department)} facilities and request access.`;
+  if(user.role==="admin") return "Full institution-wide visibility across facilities, bookings, and maintenance.";
+  if(user.role==="operations") return "Cross-department utilisation trends and reallocation insights.";
+  return "";
+}
+
+function facilitiesTable(list){
+  if(list.length===0) return `<p class="empty-state">No facilities in scope.</p>`;
+  return `<table><thead><tr><th>Name</th><th>Type</th><th>Department</th><th>Capacity</th><th>Status</th></tr></thead><tbody>
+    ${list.map(f=>`<tr><td>${esc(f.name)}</td><td>${esc(f.type)}</td><td>${esc(f.department)}</td><td>${esc(f.capacity)}</td><td><span class="badge ${f.status}">${esc(f.status)}</span></td></tr>`).join("")}
+  </tbody></table>`;
+}
+function bookingsTable(list, allowCancel){
+  const lookup = facilityLookup();
+  if(list.length===0) return `<p class="empty-state">No bookings yet.</p>`;
+  return `<table><thead><tr><th>Facility</th><th>Purpose</th><th>Start</th><th>End</th><th>Status</th>${allowCancel?"<th></th>":""}</tr></thead><tbody>
+    ${list.map(b=>`<tr><td>${esc(lookup[b.facility_id]?.name||b.facility_id)}</td><td>${esc(b.purpose)}</td><td>${new Date(b.start_time).toLocaleString()}</td><td>${new Date(b.end_time).toLocaleString()}</td><td><span class="badge ${b.status}">${esc(b.status)}</span></td>
+    ${allowCancel && b.status!=="cancelled" ? `<td><button class="btn-primary cancelBookingBtn" data-id="${b.booking_id}">Cancel</button></td>`:allowCancel?"<td></td>":""}</tr>`).join("")}
+  </tbody></table>`;
+}
+function maintenanceTable(list, allowActions){
+  const lookup = facilityLookup();
+  if(list.length===0) return `<p class="empty-state">No tickets.</p>`;
+  return `<table><thead><tr><th>Facility</th><th>Issue</th><th>Severity</th><th>Status</th>${allowActions?"<th>Action</th>":""}</tr></thead><tbody>
+    ${list.map(t=>`<tr><td>${esc(lookup[t.facility_id]?.name||t.facility_id)}</td><td>${esc(t.issue)}</td><td><span class="badge ${t.severity}">${esc(t.severity)}</span></td><td><span class="badge ${t.status}">${esc(t.status)}</span></td>
+    ${allowActions && t.status!=="resolved" ? `<td>${t.status==="open"?`<button class="btn-primary ticketStartBtn" data-id="${t.ticket_id}">Start</button> `:""}<button class="btn-primary ticketResolveBtn" data-id="${t.ticket_id}">Resolve</button></td>`:allowActions?"<td></td>":""}</tr>`).join("")}
+  </tbody></table>`;
+}
+function bookingForm(facilities){
+  return `<form id="bookingForm" class="form-row">
+    <select id="bf_facility" required><option value="">Select facility</option>${facilities.map(f=>`<option value="${f.facility_id}">${esc(f.name)}</option>`).join("")}</select>
+    <input id="bf_purpose" placeholder="Purpose" required />
+    <input id="bf_start" type="datetime-local" required />
+    <input id="bf_end" type="datetime-local" required />
+    <button class="btn-primary" type="submit">Book</button>
+  </form><div id="bf_msg" class="page-sub"></div>`;
+}
+function usageForm(facilities){
+  return `<form id="usageForm" class="form-row">
+    <select id="uf_facility" required><option value="">Facility</option>${facilities.map(f=>`<option value="${f.facility_id}">${esc(f.name)}</option>`).join("")}</select>
+    <input id="uf_hours" type="number" step="0.1" placeholder="Hours used" required />
+    <input id="uf_headcount" type="number" placeholder="Headcount" required />
+    <button class="btn-primary" type="submit">Log Usage</button>
+  </form>`;
+}
+function issueForm(facilities){
+  return `<form id="issueForm" class="form-row">
+    <select id="if_facility" required><option value="">Facility</option>${facilities.map(f=>`<option value="${f.facility_id}">${esc(f.name)}</option>`).join("")}</select>
+    <input id="if_issue" placeholder="Describe the issue" required />
+    <select id="if_severity"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option></select>
+    <button class="btn-primary" type="submit">Report Issue</button>
+  </form>`;
+}
+
+function renderFacilities(user){
+  const ids = scopedFacilityIds(user);
+  const list = ids ? DB.facilities.filter(f=>ids.includes(f.facility_id)) : DB.facilities;
+  return `
+    <h1 class="page-title">Facility Discovery</h1>
+    <p class="page-sub">Search and browse facilities within your access scope.</p>
+    <div class="form-row">
+      <input id="searchBox" placeholder="Search by name..." />
+    </div>
+    <div class="card-grid" id="facilityCards">
+      ${list.map(f=>`<div class="card"><h3>${esc(f.name)}</h3><p style="font-size:.82rem;color:var(--muted);margin:0 0 .5rem;">${esc(f.type)} · ${esc(f.department)} · Capacity ${esc(f.capacity)}</p><span class="badge ${f.status}">${esc(f.status)}</span></div>`).join("")}
+    </div>`;
+}
+
+function renderMap(user){
+  const ids = scopedFacilityIds(user);
+  const list = ids ? DB.facilities.filter(f=>ids.includes(f.facility_id)) : DB.facilities;
+  const icons = {active:"🟢", under_maintenance:"🟡", closed:"⚪"};
+  const buildings = [...new Set(list.map(f=>f.department||"General"))];
+  return `
+    <h1 class="page-title">Campus Facility Map</h1>
+    <p class="page-sub">🟢 Available &nbsp; 🔴 Occupied &nbsp; 🟡 Maintenance &nbsp; ⚪ Closed</p>
+    ${buildings.map(b=>`
+      <h2 class="section-title">${esc(b)} Block</h2>
+      <div class="card-grid">
+        ${list.filter(f=>(f.department||"General")===b).map(f=>`<div class="card"><h3>${icons[f.status]||"⚪"} ${esc(f.name)}</h3><p style="font-size:.8rem;color:var(--muted);margin:0;">${esc(f.type)} · Capacity ${esc(f.capacity)}</p></div>`).join("")}
+      </div>`).join("")}
+  `;
+}
+
+function renderAnalytics(user){
+  const ids = scopedFacilityIds(user);
+  const util = utilisationReport(ids);
+  const phantom = phantomBookingReport(ids);
+  const health = healthScores(ids);
+  const isOpsAdmin = ["admin","operations"].includes(user.role);
+  const insight = isOpsAdmin ? executiveInsight() : null;
+  const demand = isOpsAdmin ? demandIntelligence() : null;
+
+  return `
+    <h1 class="page-title">Analytics & Utilisation Intelligence</h1>
+    <p class="page-sub">Booking is an intention. Actual usage is the truth.</p>
+
+    ${insight ? `<div class="banner"><h3>📊 Executive Insight</h3><p>${esc(insight.headline)}</p><p>${esc(insight.detail)}</p><p style="font-style:italic;">${esc(insight.recommendation)}</p></div>` : ""}
+
+    <div class="card-grid">
+      <div class="card"><div class="stat">${phantom.summary.phantom_rate_pct}%</div><div class="stat-label">Phantom booking rate</div></div>
+      <div class="card"><div class="stat">${phantom.summary.total_wasted_hours}</div><div class="stat-label">Wasted booked hours</div></div>
+      <div class="card"><div class="stat">${phantom.summary.unused_bookings}</div><div class="stat-label">Unused bookings</div></div>
+      <div class="card"><div class="stat">${util.filter(u=>u.utilisation_pct!==null && u.utilisation_pct<20).length}</div><div class="stat-label">Underutilised facilities</div></div>
+    </div>
+
+    <h2 class="section-title">Facility Utilisation %</h2>
+    <table><thead><tr><th>Facility</th><th>Booked Hrs</th><th>Used Hrs</th><th style="width:160px;">Utilisation</th><th></th></tr></thead><tbody>
+      ${util.map(u=>{
+        const pct = u.utilisation_pct;
+        const color = pct===null?"#999":pct<30?"#b02a2a":pct<60?"#a0521d":"#1e7d55";
+        return `<tr><td>${esc(u.facility)}</td><td>${u.booked_hours}</td><td>${u.used_hours}</td>
+          <td><div style="display:flex;align-items:center;gap:.5rem;"><div class="bar-wrap"><div class="bar-fill" style="width:${pct||0}%;background:${color};"></div></div><span style="font-size:.78rem;">${pct??"—"}%</span></div></td>
+          <td><button class="btn-primary rootCauseBtn" data-id="${u.facility_id}">Why?</button></td></tr>`;
+      }).join("")}
+    </tbody></table>
+
+    <div id="rootCauseBox"></div>
+
+    <h2 class="section-title">Facility Health Scores</h2>
+    <div class="card-grid">
+      ${health.map(hh=>`<div class="card"><h3>${esc(hh.facility)}</h3><div class="stat" style="color:${hh.tier==='healthy'?'#1e7d55':hh.tier==='attention_required'?'#a0521d':'#b02a2a'};">${hh.health_score}/100</div><div class="stat-label">${esc(hh.tier.replace('_',' '))}</div><p style="font-size:.75rem;color:var(--muted);margin-top:.4rem;">Utilisation: ${hh.utilisation_pct??"—"}% · Open tickets: ${hh.open_maintenance_tickets} · Phantom: ${hh.phantom_booking_rate_pct}%</p></div>`).join("")}
+    </div>
+
+    ${demand ? `
+    <h2 class="section-title">Demand Intelligence</h2>
+    <div class="card-grid">
+      <div class="card"><h3>Most Requested</h3>${demand.most_requested.map(d=>`<p style="margin:.2rem 0;font-size:.85rem;">${esc(d.facility)} — ${d.bookings} bookings</p>`).join("")}</div>
+      <div class="card"><h3>Peak Hour</h3><div class="stat">${esc(demand.peak_hour)}</div></div>
+      <div class="card"><h3>Department Demand</h3>${demand.department_demand.map(d=>`<p style="margin:.2rem 0;font-size:.85rem;">${esc(d.department)} — ${d.bookings}</p>`).join("")}</div>
+    </div>` : ""}
+
+    <div class="genie-panel">${genieChatHTML("analyticsGenie")}</div>
+  `;
+}
+
+function renderAdmin(user){
+  return `
+    <h1 class="page-title">Administration</h1>
+    <p class="page-sub">Full user and facility management.</p>
+
+    <h2 class="section-title">User Management</h2>
+    <form id="userForm" class="form-row">
+      <input id="uf2_name" placeholder="Full name" required />
+      <input id="uf2_email" type="email" placeholder="Email" required />
+      <input id="uf2_password" placeholder="Password" required />
+      <select id="uf2_role">
+        <option value="admin">admin</option><option value="faculty">faculty</option><option value="student">student</option>
+        <option value="lab_incharge">lab_incharge</option><option value="maintenance">maintenance</option><option value="operations">operations</option>
+      </select>
+      <input id="uf2_department" placeholder="Department (optional)" />
+      <button class="btn-primary" type="submit">Add User</button>
+    </form>
+    <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Action</th></tr></thead><tbody>
+      ${DB.users.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${esc(u.role)}</td><td>${esc(u.department||"—")}</td><td><span class="badge ${u.active?'active':'open'}">${u.active?'active':'inactive'}</span></td><td><button class="btn-primary toggleUserBtn" data-id="${u.user_id}">${u.active?'Deactivate':'Reactivate'}</button></td></tr>`).join("")}
+    </tbody></table>
+
+    <h2 class="section-title">All Maintenance Tickets</h2>
+    ${maintenanceTable(DB.maintenance, true)}
+
+    <div style="margin-top:1.5rem;">
+      <span class="demo-flag">⚠ Static demo — data resets if you clear browser storage</span><br/>
+      <button class="btn-primary" id="resetDataBtn">Reset demo data</button>
+    </div>
+  `;
+}
+
+function wirePageEvents(user){
+  wireGenieChat("homeGenie", user);
+  const el = id=>document.getElementById(id);
+
+  if(el("analyticsGenie_input")) wireGenieChat("analyticsGenie", user);
+  document.querySelectorAll(".rootCauseBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const rc = rootCauseAnalysis(btn.dataset.id);
+      document.getElementById("rootCauseBox").innerHTML = `
+        <div class="genie-panel"><h3>🔎 Root Cause: ${esc(rc.facility)}</h3>
+        ${rc.causes.map(c=>`<div class="cause-block"><strong style="color:var(--navy);">${esc(c.cause)}</strong><p style="margin:.2rem 0;font-size:.85rem;color:var(--muted);">${esc(c.evidence)}</p><p style="margin:0;font-size:.85rem;font-style:italic;color:var(--teal);">→ ${esc(c.recommended_action)}</p></div>`).join("")}
+        </div>`;
+    });
+  });
+
+  document.querySelectorAll(".cancelBookingBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ cancelBooking(user, btn.dataset.id); renderApp(user); });
+  });
+  document.querySelectorAll(".ticketStartBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ updateTicketStatus(btn.dataset.id, "in_progress"); renderApp(user); });
+  });
+  document.querySelectorAll(".ticketResolveBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ updateTicketStatus(btn.dataset.id, "resolved"); renderApp(user); });
+  });
+  document.querySelectorAll(".toggleUserBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ toggleUserActive(btn.dataset.id); renderApp(user); });
+  });
+
+  if(el("bookingForm")){
+    el("bookingForm").addEventListener("submit", e=>{
+      e.preventDefault();
+      const res = createBooking(user, {facility_id:el("bf_facility").value, purpose:el("bf_purpose").value, start_time:el("bf_start").value, end_time:el("bf_end").value});
+      el("bf_msg").textContent = res.msg;
+      if(res.ok) renderApp(user);
+    });
+  }
+  if(el("usageForm")){
+    el("usageForm").addEventListener("submit", e=>{
+      e.preventDefault();
+      logUsage(user, {facility_id:el("uf_facility").value, hours_actually_used:el("uf_hours").value, headcount:el("uf_headcount").value});
+      renderApp(user);
+    });
+  }
+  if(el("issueForm")){
+    el("issueForm").addEventListener("submit", e=>{
+      e.preventDefault();
+      reportIssue(user, {facility_id:el("if_facility").value, issue:el("if_issue").value, severity:el("if_severity").value});
+      renderApp(user);
+    });
+  }
+  if(el("userForm")){
+    el("userForm").addEventListener("submit", e=>{
+      e.preventDefault();
+      createUser({name:el("uf2_name").value, email:el("uf2_email").value, password:el("uf2_password").value, role:el("uf2_role").value, department:el("uf2_department").value});
+      renderApp(user);
+    });
+  }
+  if(el("resetDataBtn")) el("resetDataBtn").addEventListener("click", resetDemoData);
+  if(el("searchBox")){
+    el("searchBox").addEventListener("input", ()=>{
+      const term = el("searchBox").value.toLowerCase();
+      const ids = scopedFacilityIds(user);
+      const list = (ids?DB.facilities.filter(f=>ids.includes(f.facility_id)):DB.facilities).filter(f=>f.name.toLowerCase().includes(term));
+      el("facilityCards").innerHTML = list.map(f=>`<div class="card"><h3>${esc(f.name)}</h3><p style="font-size:.82rem;color:var(--muted);margin:0 0 .5rem;">${esc(f.type)} · ${esc(f.department)} · Capacity ${esc(f.capacity)}</p><span class="badge ${f.status}">${esc(f.status)}</span></div>`).join("");
+    });
+  }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+================================================================
+LABPULSE — GENIE-POWERED FACILITY & LABORATORY UTILISATION
+INTELLIGENCE (ROLE-BASED EDITION)
+Databricks Campus Hackathon — RVCE Edition, Bengaluru Tech Week 2026
+Track A: Real-World Campus Problem Solver
+Theme: Genie-Powered Campus Intelligence
+================================================================
+
+1. PROBLEM STATEMENT
+----------------------------------------------------------------
+Campus labs, seminar halls, and specialised equipment run on a
+trust-based booking system where a reservation is treated as
+proof of use. Faculty reserve slots that are frequently left
+unused, while the calendar shows the facility as unavailable to
+others who genuinely need it. Operations teams have visibility
+only into booking records, never into actual usage, so idle
+infrastructure remains invisible. Maintenance problems such as
+faulty equipment or broken fixtures go untracked against
+availability, silently removing a facility from effective use
+for weeks while it still appears bookable on paper.
+
+This is a real, measurable inefficiency that affects budget
+planning, student learning access, and faculty time — and no
+existing campus tool connects booking data, usage data, and
+maintenance data together to explain it.
+
+2. PROPOSED SOLUTION
+----------------------------------------------------------------
+LabPulse is a role-aware, conversational facility intelligence
+platform that reconciles what is booked against what is actually
+used, and explains the gap in plain language. Faculty ask
+natural-language questions to instantly find and reserve
+genuinely free labs and halls. Operations teams ask analytical
+questions to uncover underused facilities and understand the
+root cause behind low utilisation. A single Databricks Genie
+Space, connected to Delta tables in Unity Catalog, powers every
+role's experience from one governed source of truth — but the
+answers Genie gives are scoped differently depending on who is
+asking.
+
+3. CORE INNOVATION
+----------------------------------------------------------------
+a) Usage reconciliation as a first-class feature — not just
+   reporting what's booked, but comparing it against ground-truth
+   usage logs so Genie can distinguish "booked but never used"
+   from genuine demand.
+b) Root cause attribution — when Genie flags an underused
+   facility, it automatically checks maintenance records in the
+   same conversation, turning a number into an actionable
+   decision.
+c) Role-scoped AI reasoning — access control is not a login
+   screen bolted on top. The user's role and scope (department,
+   assigned facility IDs) are injected into every Genie query, so
+   the SAME Genie Space enforces different visibility for a
+   student versus a lab incharge versus an admin, without
+   maintaining five separate spaces.
+d) Self-auditing infrastructure — continuous reconciliation
+   replaces manual, once-a-semester spreadsheet audits with an
+   always-on process.
+e) Zero-training conversational access — no dashboards, filters,
+   or query languages to learn; every role gets a data-backed
+   answer in plain English.
+
+4. ROLE-BASED ACCESS CONTROL MODEL
+----------------------------------------------------------------
+ADMIN
+  Full visibility across all facilities, departments, users, and
+  data. Can create/deactivate accounts, assign roles, override
+  bookings, view institution-wide analytics.
+  Genie access: unrestricted.
+
+FACULTY
+  Can search and book facilities in their own department, view
+  their own booking history, ask readiness questions about labs
+  relevant to their department.
+  Genie access: scoped to their department and their own bookings.
+
+STUDENT
+  Can check facility/lab availability for approved activities
+  (club events, project work, open lab hours). Cannot book
+  restricted labs directly — requests route to faculty or lab
+  incharge for approval.
+  Genie access: read-only, availability-focused questions only.
+
+LAB INCHARGE
+  Owns one or more specific labs. Manages the booking calendar for
+  assigned labs, logs actual usage manually when no IoT feed
+  exists, flags equipment issues into the maintenance queue.
+  Genie access: scoped to assigned facilities, with full
+  utilisation and gap analysis for those facilities only.
+
+MAINTENANCE / TECHNICAL TEAM
+  Sees an open queue of reported issues across all facilities,
+  updates resolution status, can mark a facility temporarily
+  unavailable during repair.
+  Genie access: scoped to maintenance records and facility
+  availability impact only — no booking or academic usage data.
+
+OPERATIONS TEAM
+  Broadest analytical role below admin. Views utilisation trends,
+  idle facility reports, cross-department comparisons for
+  reallocation decisions. Cannot alter user accounts or roles.
+  Genie access: full analytical scope across bookings, usage, and
+  maintenance — not user management data.
+
+GUEST / VISITING FACULTY ("OTHERS")
+  Time-boxed, limited access to check availability of specific
+  pre-approved facilities for a defined event window, expiring
+  automatically.
+  Genie access: heavily restricted, single-purpose availability
+  lookups only.
+
+5. SYSTEM ARCHITECTURE
+----------------------------------------------------------------
+FRONTEND
+  React (Vite) single-page application. Role-based dashboard that
+  changes layout and available actions depending on the logged-in
+  role. Each role gets a distinct home screen.
+
+BACKEND & AUTH
+  Node.js + Express REST API. Login issues a JWT embedding the
+  user's role and scope (department or assigned facility IDs).
+  Every API call is checked against this scope server-side before
+  it reaches any data or Genie call — access control is enforced
+  at the request layer, not just hidden in the UI.
+
+GENIE INTEGRATION LAYER (the key architectural decision)
+  Instead of one open Genie Space for everyone, the backend
+  constructs a scoped context per request — role + permitted
+  facility/department IDs — and passes it alongside the natural
+  language question to the Genie Conversation API. Genie's own
+  Space instructions are written to respect these scope
+  parameters, so the same Genie Space intelligently limits what
+  it computes or returns based on who is asking.
+
+DATA LAYER
+  Delta tables in Unity Catalog: facilities, bookings, usage_logs,
+  maintenance_records, users (role + scope), plus an
+  approval_requests table for the student-to-faculty workflow and
+  a genie_query_log table for auditability. Full schema in
+  database/schema.sql.
+
+NOTIFICATION & WORKFLOW LAYER
+  When a student requests a restricted lab, an approval task
+  routes to the relevant faculty/lab incharge. When a lab incharge
+  flags an equipment issue, a maintenance ticket auto-generates
+  and the facility is conditionally marked unavailable until
+  resolved — closing the loop without manual coordination.
+
+6. END-TO-END WORKFLOW EXAMPLE
+----------------------------------------------------------------
+A lab incharge sees a chemistry lab running at 18% utilisation
+this month and asks Genie why. Genie checks maintenance records
+scoped to that lab and reports an unresolved fume extractor fault
+logged three weeks ago. The lab incharge escalates it, auto-
+generating a ticket for the maintenance team. The maintenance
+team updates the ticket to in-progress; the booking calendar
+shows a temporary hold on that facility. Once resolved, the
+facility becomes bookable again, and next month operations can
+ask Genie to confirm utilisation recovered. Every step is real,
+traceable, and requires zero spreadsheets or emails.
+
+7. REAL WORLD IMPACT
+----------------------------------------------------------------
+STUDENTS      — better access to labs/equipment previously
+                blocked by phantom bookings.
+FACULTY       — no more facilities that appear booked but
+                aren't; instant self-service booking.
+LAB INCHARGES — an early warning system tied directly to root
+                cause, not just a usage number.
+MAINTENANCE   — a clean, prioritised queue instead of scattered
+                complaints.
+OPERATIONS &
+ADMIN         — institution-wide evidence for capital planning,
+                without wading through raw spreadsheets.
+
+8. WHY THIS SOLUTION WINS
+----------------------------------------------------------------
+- Solves a real, measurable, and universal campus problem that no
+  existing tool addresses.
+- Genie is genuinely central to the product — every answer, for
+  every role, is generated by Genie's NL-to-SQL reasoning, not
+  hardcoded application logic.
+- Role-based access control is built into the AI reasoning layer
+  itself, not just the login screen — closer to how a real
+  institutional deployment would actually need to work.
+- Requires zero new infrastructure: runs entirely on Databricks
+  Free Edition using data formats campuses already generate (ERP
+  exports, booking exports, ID-swipe/IoT logs, maintenance
+  trackers).
+- Demonstrates a complete, demoable journey from a vague question
+  to a specific, scoped, actionable answer — for seven different
+  roles, from one shared data platform.
+
+9. TECH STACK SUMMARY
+----------------------------------------------------------------
+Frontend    : React 18 + Vite, plain CSS (no framework lock-in)
+Backend     : Node.js + Express, JWT auth (jsonwebtoken), RBAC
+              middleware
+Data        : Delta tables in Databricks Unity Catalog (or any
+              relational DB for local dev — schema.sql included)
+AI Layer    : Databricks Genie Space + Genie Conversation API,
+              scoped per role via injected context
+Auth        : JWT with embedded role + scope claims, validated on
+              every request server-side
+
+10. PROJECT FILES
+----------------------------------------------------------------
+See README.md for the full folder structure and setup
+instructions to run the backend and frontend locally, plus the
+steps to connect the backend to a real Databricks Genie Space.
+================================================================

@@ -1,0 +1,12 @@
+[
+  { "facility_id": "F001", "name": "Organic Chemistry Lab", "type": "lab", "capacity": 30, "department": "Chemistry", "status": "active" },
+  { "facility_id": "F002", "name": "Physics Mechanics Lab", "type": "lab", "capacity": 25, "department": "Physics", "status": "active" },
+  { "facility_id": "F003", "name": "Seminar Hall A", "type": "hall", "capacity": 100, "department": "Admin", "status": "active" },
+  { "facility_id": "F004", "name": "Computer Lab 1", "type": "lab", "capacity": 40, "department": "Computer Science", "status": "active" },
+  { "facility_id": "F005", "name": "Electronics Lab", "type": "lab", "capacity": 20, "department": "ECE", "status": "under_maintenance" },
+  { "facility_id": "F006", "name": "3D Printing Studio", "type": "equipment", "capacity": 10, "department": "Mechanical", "status": "active" },
+  { "facility_id": "F007", "name": "Computer Lab 2", "type": "lab", "capacity": 40, "department": "Computer Science", "status": "active" },
+  { "facility_id": "F008", "name": "Seminar Hall B", "type": "hall", "capacity": 60, "department": "Admin", "status": "active" },
+  { "facility_id": "F009", "name": "Materials Testing Lab", "type": "lab", "capacity": 15, "department": "Mechanical", "status": "active" },
+  { "facility_id": "F010", "name": "Inorganic Chemistry Lab", "type": "lab", "capacity": 30, "department": "Chemistry", "status": "active" }
+]
